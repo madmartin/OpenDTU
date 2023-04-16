@@ -62,6 +62,7 @@ enum WebApiError {
     NetworkGatewayInvalid,
     NetworkDns1Invalid,
     NetworkDns2Invalid,
+    NetworkApTimeoutInvalid,
 
     NtpBase = 9000,
     NtpServerLength,
