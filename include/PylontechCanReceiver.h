@@ -33,7 +33,7 @@ private:
 
     uint32_t _lastPublish;
     twai_general_config_t g_config;
-
+    esp_err_t twaiLastResult;
 };
 
 extern PylontechCanReceiverClass PylontechCanReceiver;

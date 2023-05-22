@@ -14,12 +14,10 @@ PylontechCanReceiverClass PylontechCanReceiver;
 void PylontechCanReceiverClass::init(int8_t rx, int8_t tx)
 {
     CONFIG_T& config = Configuration.get();
-    if (!config.Battery_Enabled) {
-        return;
-    }
-
     g_config = TWAI_GENERAL_CONFIG_DEFAULT((gpio_num_t)tx, (gpio_num_t)rx, TWAI_MODE_NORMAL);
-    enable();
+    if (config.Battery_Enabled) {
+        enable();
+    }
 }
 
 void PylontechCanReceiverClass::enable()
@@ -29,17 +27,31 @@ void PylontechCanReceiverClass::enable()
     twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();
 
     // Install TWAI driver
-    if (twai_driver_install(&g_config, &t_config, &f_config) == ESP_OK) {
-        MessageOutput.printf("[Pylontech] Twai driver installed\n");
-    } else {
-        MessageOutput.printf("[Pylontech] Failed to install Twai driver\n");
+    twaiLastResult = twai_driver_install(&g_config, &t_config, &f_config);
+    switch (twaiLastResult) {
+        case ESP_OK:
+            MessageOutput.println(F("[Pylontech] Twai driver installed"));
+            break;
+        case ESP_ERR_INVALID_ARG:
+            MessageOutput.println(F("[Pylontech] Twai driver install - invalid arg"));
+            break;
+        case ESP_ERR_NO_MEM:
+            MessageOutput.println(F("[Pylontech] Twai driver install - no memory"));
+            break;
+        case ESP_ERR_INVALID_STATE:
+            MessageOutput.println(F("[Pylontech] Twai driver install - invalid state"));
+            break;
     }
 
     // Start TWAI driver
-    if (twai_start() == ESP_OK) {
-        MessageOutput.printf("[Pylontech] Twai driver started\n");
-    } else {
-        MessageOutput.printf("[Pylontech] Failed to start Twai driver\n");
+    twaiLastResult = twai_start();
+    switch (twaiLastResult) {
+        case ESP_OK:
+            MessageOutput.println(F("[Pylontech] Twai driver started"));
+            break;
+        case ESP_ERR_INVALID_STATE:
+            MessageOutput.println(F("[Pylontech] Twai driver start - invalid state"));
+            break;
     }
 }
 
@@ -99,8 +111,16 @@ void PylontechCanReceiverClass::parseCanPackets()
 {
     // Check for messages. twai_receive is blocking when there is no data so we return if there are no frames in the buffer
     twai_status_info_t status_info;
-    if (twai_get_status_info(&status_info) != ESP_OK) {
-        MessageOutput.printf("[Pylontech] Failed to get Twai status info\n");
+    twaiLastResult = twai_get_status_info(&status_info);
+    if (twaiLastResult != ESP_OK) {
+        switch (twaiLastResult) {
+            case ESP_ERR_INVALID_ARG:
+                MessageOutput.println(F("[Pylontech] Twai driver get status - invalid arg"));
+                break;
+            case ESP_ERR_INVALID_STATE:
+                MessageOutput.println(F("[Pylontech] Twai driver get status - invalid state"));
+                break;
+        }
         return;
     }
     if (status_info.msgs_to_rx == 0) {
@@ -110,7 +130,7 @@ void PylontechCanReceiverClass::parseCanPackets()
     // Wait for message to be received, function is blocking
     twai_message_t rx_message;
     if (twai_receive(&rx_message, pdMS_TO_TICKS(100)) != ESP_OK) {
-        MessageOutput.printf("[Pylontech] Failed to receive message\n");
+        MessageOutput.println(F("[Pylontech] Failed to receive message"));
         return;
     }
 
