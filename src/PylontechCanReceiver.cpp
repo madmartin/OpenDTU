@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 #include "PylontechCanReceiver.h"
 #include "Battery.h"
 #include "Configuration.h"
@@ -17,14 +18,12 @@ void PylontechCanReceiverClass::init(int8_t rx, int8_t tx)
         return;
     }
 
-  g_config = TWAI_GENERAL_CONFIG_DEFAULT((gpio_num_t)tx, (gpio_num_t)rx, TWAI_MODE_NORMAL);
-  enable();
-
+    g_config = TWAI_GENERAL_CONFIG_DEFAULT((gpio_num_t)tx, (gpio_num_t)rx, TWAI_MODE_NORMAL);
+    enable();
 }
 
 void PylontechCanReceiverClass::enable()
 {
-
     // Initialize configuration structures using macro initializers
     twai_timing_config_t t_config = TWAI_TIMING_CONFIG_500KBITS();
     twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();
@@ -98,11 +97,10 @@ void PylontechCanReceiverClass::mqtt()
 
 void PylontechCanReceiverClass::parseCanPackets()
 {
-
-    // Check for messages. twai_recive is blocking when there is no data so we return if there are no frames in the buffer
+    // Check for messages. twai_receive is blocking when there is no data so we return if there are no frames in the buffer
     twai_status_info_t status_info;
     if (twai_get_status_info(&status_info) != ESP_OK) {
-        MessageOutput.printf("[Pylontech]Failed to get Twai status info\n");
+        MessageOutput.printf("[Pylontech] Failed to get Twai status info\n");
         return;
     }
     if (status_info.msgs_to_rx == 0) {
@@ -235,14 +233,12 @@ void PylontechCanReceiverClass::parseCanPackets()
     }
 }
 
-
 uint16_t PylontechCanReceiverClass::readUnsignedInt16(uint8_t *data)
 {
     uint8_t bytes[2];
     bytes[0] = *data;
     bytes[1] = *(data + 1);
     return (bytes[1] << 8) + bytes[0];
-
 }
 
 int16_t PylontechCanReceiverClass::readSignedInt16(uint8_t *data)
