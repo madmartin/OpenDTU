@@ -22,6 +22,9 @@ void PylontechCanReceiverClass::init(int8_t rx, int8_t tx)
 
 void PylontechCanReceiverClass::enable()
 {
+    if (_isEnabled) {
+        return;
+    }
     // Initialize configuration structures using macro initializers
     twai_timing_config_t t_config = TWAI_TIMING_CONFIG_500KBITS();
     twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();
@@ -48,9 +51,40 @@ void PylontechCanReceiverClass::enable()
     switch (twaiLastResult) {
         case ESP_OK:
             MessageOutput.println(F("[Pylontech] Twai driver started"));
+            _isEnabled = true;
             break;
         case ESP_ERR_INVALID_STATE:
             MessageOutput.println(F("[Pylontech] Twai driver start - invalid state"));
+            break;
+    }
+}
+
+void PylontechCanReceiverClass::disable()
+{
+    if (!_isEnabled) {
+        return;
+    }
+
+    // Stop TWAI driver
+    twaiLastResult = twai_stop();
+    switch (twaiLastResult) {
+        case ESP_OK:
+            MessageOutput.println(F("[Pylontech] Twai driver stopped"));
+            break;
+        case ESP_ERR_INVALID_STATE:
+            MessageOutput.println(F("[Pylontech] Twai driver stop - invalid state"));
+            break;
+    }
+
+    // Uninstall TWAI driver
+    twaiLastResult = twai_driver_uninstall();
+    switch (twaiLastResult) {
+        case ESP_OK:
+            MessageOutput.println(F("[Pylontech] Twai driver uninstalled"));
+            _isEnabled = false;
+            break;
+        case ESP_ERR_INVALID_STATE:
+            MessageOutput.println(F("[Pylontech] Twai driver uninstall - invalid state"));
             break;
     }
 }
