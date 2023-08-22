@@ -87,6 +87,9 @@ void MqttHandleVedirectHassClass::publishSensor(const char* caption, const char*
 
     String sensorId = caption;
     sensorId.replace(" ", "_");
+    sensorId.replace(".", "");
+    sensorId.replace("(", "");
+    sensorId.replace(")", "");
     sensorId.toLowerCase();
 
     String configTopic = "sensor/dtu_victron_" + serial
@@ -131,6 +134,9 @@ void MqttHandleVedirectHassClass::publishBinarySensor(const char* caption, const
 
     String sensorId = caption;
     sensorId.replace(" ", "_");
+    sensorId.replace(".", "");
+    sensorId.replace("(", "");
+    sensorId.replace(")", "");
     sensorId.toLowerCase();
 
     String configTopic = "binary_sensor/dtu_victron_" + serial
