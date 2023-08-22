@@ -62,7 +62,7 @@ void MqttHandleVedirectHassClass::publishConfig()
     publishSensor("MPPT error code", "ERR");
     publishSensor("MPPT off reason", "OR");
     publishSensor("MPPT tracker operation mode", "MPPT");
-    publishSensor("MPPT Day sequence number (0...364)", "HSDS", "duration", "total_increasing", "d");
+    publishSensor("MPPT Day sequence number (0...364)", "HSDS", NULL, "total", "d");
 
     // battery info
     publishSensor("Battery voltage", "V", "voltage", "measurement", "V");
@@ -71,11 +71,10 @@ void MqttHandleVedirectHassClass::publishConfig()
     // panel info
     publishSensor("Panel voltage", "VPV", "voltage", "measurement", "V");
     publishSensor("Panel power", "PPV", "power", "measurement", "W");
-    publishSensor("Panel power", "PPV", "power", "measurement", "W");
     publishSensor("Panel yield total", "H19", "energy", "total_increasing", "kWh");
-    publishSensor("Panel yield today", "H20", "energy", "total_increasing", "kWh");
+    publishSensor("Panel yield today", "H20", "energy", "total", "kWh");
     publishSensor("Panel maximum power today", "H21", "power", "measurement", "W");
-    publishSensor("Panel yield yesterday", "H22", "energy", "measurement", "kWh");
+    publishSensor("Panel yield yesterday", "H22", "energy", "total", "kWh");
     publishSensor("Panel maximum power yesterday", "H23", "power", "measurement", "W");
 
     yield();
